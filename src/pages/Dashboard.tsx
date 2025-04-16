@@ -1,125 +1,141 @@
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
-import { DashboardSidebar } from "@/components/dashboard/DashboardSidebar";
-import { MetricsGrid } from "@/components/dashboard/MetricsGrid";
-import { MetricsCharts } from "@/components/dashboard/MetricsCharts";
-import { GrafanaEmbed } from "@/components/dashboard/GrafanaEmbed";
-import { useState } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { SystemMetrics, MetricCategory } from "@/types/metrics";
+import { usePrometheusMetrics } from "@/hooks/usePrometheusMetrics";
 import {
-  ResizableHandle,
-  ResizablePanel,
-  ResizablePanelGroup,
-} from "@/components/ui/resizable";
+  Cpu,
+  MemoryStick as Memory,
+  HardDrive,
+  Network,
+  RefreshCw,
+} from "lucide-react";
+import { useEffect, useState } from "react";
+import { MetricsGrid } from "@/components/dashboard/MetricsGrid";
+import { MetricCategory } from "@/types/metrics";
+import { useToast } from "@/hooks/use-toast";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Separator } from "@/components/ui/separator";
 
 export function Dashboard() {
-  const [metrics] = useState<SystemMetrics[]>([]);
+  const { currentMetrics, fetchMetricsNow } = usePrometheusMetrics();
+  const [lastUpdated, setLastUpdated] = useState(new Date());
   const [selectedCategory, setSelectedCategory] =
-    useState<MetricCategory>("system");
-  const [currentMetrics] = useState<SystemMetrics>({
-    // System Info
-    hostname: "System",
-    os: "Unknown",
-    uptime: 0,
-    bootTime: new Date().toISOString(),
-    loggedInUsers: 1,
+    useState<MetricCategory>("cpu");
+  const { toast } = useToast();
 
-    // CPU Metrics
-    cpu: 0,
-    cpuCores: [],
-    cpuLoadAverage: {
-      oneMin: 0,
-      fiveMin: 0,
-      fifteenMin: 0,
-    },
-    cpuTemperature: 0,
-    cpuFrequency: 0,
+  useEffect(() => {
+    console.log("Dashboard component mounted");
 
-    // Memory Metrics
-    memory: {
-      total: 0,
-      used: 0,
-      free: 0,
-      usagePercentage: 0,
-    },
-    swap: {
-      total: 0,
-      used: 0,
-      free: 0,
-    },
+    fetchMetricsNow();
+    setLastUpdated(new Date());
 
-    // Disk Metrics
-    disk: {
-      total: 0,
-      used: 0,
-      free: 0,
-      usagePercentage: 0,
-      readSpeed: 0,
-      writeSpeed: 0,
-    },
-    mountPoints: [],
+    const interval = setInterval(() => {
+      console.log("Auto-refreshing metrics...");
+      fetchMetricsNow();
+      setLastUpdated(new Date());
+    }, 5000);
 
-    // Network Metrics
-    network: {
-      downloadSpeed: 0,
-      uploadSpeed: 0,
-      totalReceived: 0,
-      totalSent: 0,
-      errors: 0,
-      droppedPackets: 0,
-    },
-    networkInterfaces: [],
+    toast({
+      title: "Dashboard Active",
+      description: "Real-time metrics are now being fetched every 5 seconds",
+    });
 
-    // Process Metrics
-    processes: {
-      total: 0,
-      running: 0,
-      sleeping: 0,
-      stopped: 0,
-      zombie: 0,
-      topCpu: [],
-      topMemory: [],
-    },
+    return () => clearInterval(interval);
+  }, [fetchMetricsNow, toast]);
 
-    timestamp: Date.now(),
-  });
+  const handleRefresh = () => {
+    console.log("Manual refresh triggered");
+    fetchMetricsNow();
+    setLastUpdated(new Date());
+
+    toast({
+      title: "Refreshed",
+      description: "Metrics have been manually refreshed",
+    });
+  };
 
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="flex min-h-screen flex-col bg-background">
       <DashboardHeader />
-      <div className="flex-1">
-        <ResizablePanelGroup direction="horizontal">
-          <ResizablePanel defaultSize={20} minSize={15} maxSize={25}>
-            <DashboardSidebar
-              selectedCategory={selectedCategory}
-              onSelectCategory={setSelectedCategory}
-            />
-          </ResizablePanel>
-          <ResizableHandle withHandle />
-          <ResizablePanel defaultSize={80}>
-            <div className="h-full p-8 space-y-8">
+      <div className="flex-1 p-4 md:p-6 relative">
+        <div className="max-w-7xl mx-auto space-y-6 relative z-10">
+          {/* Dashboard Header */}
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div>
+              <h2 className="text-2xl md:text-3xl font-bold">System Metrics</h2>
+              <p className="text-muted-foreground mt-1">
+                Monitor your system performance in real-time
+              </p>
+            </div>
+            <div className="flex items-center gap-3 bg-background border rounded-lg p-2 shadow-sm">
+              <span className="text-sm text-muted-foreground flex items-center">
+                <span className="inline-block w-2 h-2 rounded-full bg-green-500 mr-2 animate-pulse"></span>
+                Updated: {lastUpdated.toLocaleTimeString()}
+              </span>
+              <button
+                onClick={handleRefresh}
+                className="flex items-center gap-2 px-3 py-1.5 bg-primary/10 hover:bg-primary/20 text-primary rounded-md transition-colors text-sm"
+              >
+                <RefreshCw className="h-3.5 w-3.5" />
+                <span>Refresh</span>
+              </button>
+            </div>
+          </div>
+
+          <Separator />
+
+          {/* Metrics Tabs */}
+          <Tabs
+            defaultValue="cpu"
+            value={selectedCategory}
+            onValueChange={(value) =>
+              setSelectedCategory(value as MetricCategory)
+            }
+            className="w-full"
+          >
+            <TabsList className="grid grid-cols-4 mb-6">
+              <TabsTrigger value="cpu" className="flex items-center gap-2">
+                <Cpu className="h-4 w-4" />
+                <span>CPU</span>
+              </TabsTrigger>
+              <TabsTrigger value="memory" className="flex items-center gap-2">
+                <Memory className="h-4 w-4" />
+                <span>Memory</span>
+              </TabsTrigger>
+              <TabsTrigger value="network" className="flex items-center gap-2">
+                <Network className="h-4 w-4" />
+                <span>Network</span>
+              </TabsTrigger>
+              <TabsTrigger
+                value="processes"
+                className="flex items-center gap-2"
+              >
+                <HardDrive className="h-4 w-4" />
+                <span>Processes</span>
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="cpu" className="mt-0">
+              <MetricsGrid metrics={currentMetrics} selectedCategory="cpu" />
+            </TabsContent>
+
+            <TabsContent value="memory" className="mt-0">
+              <MetricsGrid metrics={currentMetrics} selectedCategory="memory" />
+            </TabsContent>
+
+            <TabsContent value="network" className="mt-0">
               <MetricsGrid
                 metrics={currentMetrics}
-                selectedCategory={selectedCategory}
+                selectedCategory="network"
               />
+            </TabsContent>
 
-              <Tabs defaultValue="metrics" className="space-y-4">
-                <TabsList className="grid w-full grid-cols-2 lg:w-[400px]">
-                  <TabsTrigger value="metrics">Detailed Metrics</TabsTrigger>
-                  <TabsTrigger value="grafana">Grafana Dashboard</TabsTrigger>
-                </TabsList>
-
-                <TabsContent value="metrics" className="space-y-4">
-                  <MetricsCharts metrics={metrics} />
-                </TabsContent>
-
-                <TabsContent value="grafana">
-                  <GrafanaEmbed />
-                </TabsContent>
-              </Tabs>
-            </div>
-          </ResizablePanel>
-        </ResizablePanelGroup>
+            <TabsContent value="processes" className="mt-0">
+              <MetricsGrid
+                metrics={currentMetrics}
+                selectedCategory="processes"
+              />
+            </TabsContent>
+          </Tabs>
+        </div>
       </div>
     </div>
   );
