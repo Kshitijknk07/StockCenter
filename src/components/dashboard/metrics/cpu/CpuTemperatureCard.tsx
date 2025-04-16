@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Thermometer } from "lucide-react";
+import { InfoTooltip } from "@/components/ui/info-tooltip";
 
 interface CpuTemperatureCardProps {
   temperature: number;
@@ -15,6 +16,10 @@ export function CpuTemperatureCard({ temperature }: CpuTemperatureCardProps) {
             <Thermometer className="h-4 w-4 text-primary" />
           </div>
           Temperature
+          <InfoTooltip
+            className="ml-2"
+            content="Shows the current CPU temperature. Normal operating temperatures are typically between 40-70°C. Temperatures above 80°C may indicate cooling issues."
+          />
         </CardTitle>
       </CardHeader>
       <CardContent>

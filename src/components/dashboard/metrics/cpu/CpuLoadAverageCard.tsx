@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Activity } from "lucide-react";
+import { InfoTooltip } from "@/components/ui/info-tooltip";
 
 interface CpuLoadAverageCardProps {
   loadAverage: {
@@ -19,6 +20,10 @@ export function CpuLoadAverageCard({ loadAverage }: CpuLoadAverageCardProps) {
             <Activity className="h-4 w-4 text-primary" />
           </div>
           Load Average
+          <InfoTooltip
+            className="ml-2"
+            content="Load average represents the average system load over time. Values below 1.0 indicate the system is not fully utilized, while values above 1.0 per CPU core may indicate overloading."
+          />
         </CardTitle>
       </CardHeader>
       <CardContent>

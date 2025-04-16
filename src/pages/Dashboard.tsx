@@ -13,6 +13,12 @@ import { MetricCategory } from "@/types/metrics";
 import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export function Dashboard() {
   const { currentMetrics, fetchMetricsNow } = usePrometheusMetrics();
@@ -92,22 +98,100 @@ export function Dashboard() {
             className="w-full"
           >
             <TabsList className="grid grid-cols-4 mb-6">
-              <TabsTrigger value="cpu" className="flex items-center gap-2">
-                <Cpu className="h-4 w-4" />
-                <span>CPU</span>
-              </TabsTrigger>
-              <TabsTrigger value="memory" className="flex items-center gap-2">
-                <Memory className="h-4 w-4" />
-                <span>Memory</span>
-              </TabsTrigger>
-              <TabsTrigger value="network" className="flex items-center gap-2">
-                <Network className="h-4 w-4" />
-                <span>Network</span>
-              </TabsTrigger>
-              <TabsTrigger value="process" className="flex items-center gap-2">
-                <HardDrive className="h-4 w-4" />
-                <span>Processes</span>{" "}
-              </TabsTrigger>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <TabsTrigger
+                      value="cpu"
+                      className={`flex items-center gap-2 ${
+                        selectedCategory === "cpu"
+                          ? "bg-primary/20 text-primary font-medium"
+                          : ""
+                      }`}
+                    >
+                      <Cpu className="h-4 w-4" />
+                      <span>CPU</span>
+                    </TabsTrigger>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p className="text-xs max-w-xs">
+                      CPU metrics show processor usage, temperature, and
+                      performance data
+                    </p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <TabsTrigger
+                      value="memory"
+                      className={`flex items-center gap-2 ${
+                        selectedCategory === "memory"
+                          ? "bg-primary/20 text-primary font-medium"
+                          : ""
+                      }`}
+                    >
+                      <Memory className="h-4 w-4" />
+                      <span>Memory</span>
+                    </TabsTrigger>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p className="text-xs max-w-xs">
+                      Memory metrics show RAM and swap usage information
+                    </p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <TabsTrigger
+                      value="network"
+                      className={`flex items-center gap-2 ${
+                        selectedCategory === "network"
+                          ? "bg-primary/20 text-primary font-medium"
+                          : ""
+                      }`}
+                    >
+                      <Network className="h-4 w-4" />
+                      <span>Network</span>
+                    </TabsTrigger>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p className="text-xs max-w-xs">
+                      Network metrics show data transfer rates, connections, and
+                      interface information
+                    </p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <TabsTrigger
+                      value="process"
+                      className={`flex items-center gap-2 ${
+                        selectedCategory === "process"
+                          ? "bg-primary/20 text-primary font-medium"
+                          : ""
+                      }`}
+                    >
+                      <HardDrive className="h-4 w-4" />
+                      <span>Processes</span>
+                    </TabsTrigger>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p className="text-xs max-w-xs">
+                      Process metrics show running applications, resource usage,
+                      and system tasks
+                    </p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </TabsList>
 
             <TabsContent value="cpu" className="mt-0">

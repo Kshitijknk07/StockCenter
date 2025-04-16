@@ -3,6 +3,7 @@ import { LineChart } from "../../charts/LineChart";
 import { LineChart as LineChartIcon } from "lucide-react";
 import { useState, useEffect } from "react";
 import { usePrometheusMetrics } from "@/hooks/usePrometheusMetrics";
+import { InfoTooltip } from "@/components/ui/info-tooltip";
 
 export function CpuUsageHistoryCard() {
   const [cpuHistory, setCpuHistory] = useState<number[]>([]);
@@ -36,6 +37,10 @@ export function CpuUsageHistoryCard() {
             <LineChartIcon className="h-4 w-4 text-primary" />
           </div>
           CPU Usage History
+          <InfoTooltip
+            className="ml-2"
+            content="Displays CPU usage over time. This helps identify usage patterns and potential performance issues that may occur periodically."
+          />
         </CardTitle>
       </CardHeader>
       <CardContent>

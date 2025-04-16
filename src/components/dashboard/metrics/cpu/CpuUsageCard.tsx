@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Cpu } from "lucide-react";
+import { InfoTooltip } from "@/components/ui/info-tooltip";
 
 interface CpuUsageCardProps {
   cpu: number;
@@ -15,6 +16,10 @@ export function CpuUsageCard({ cpu }: CpuUsageCardProps) {
             <Cpu className="h-4 w-4 text-primary" />
           </div>
           CPU Usage
+          <InfoTooltip
+            className="ml-2"
+            content="Shows the overall CPU utilization across all cores. High CPU usage may indicate resource-intensive tasks running on your system."
+          />
         </CardTitle>
       </CardHeader>
       <CardContent>

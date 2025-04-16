@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { HardDrive } from "lucide-react";
 import { formatBytes } from "@/lib/format";
+import { InfoTooltip } from "@/components/ui/info-tooltip";
 
 interface SwapMemoryCardProps {
   swap: {
@@ -22,6 +23,10 @@ export function SwapMemoryCard({ swap }: SwapMemoryCardProps) {
             <HardDrive className="h-4 w-4 text-primary" />
           </div>
           Swap Memory
+          <InfoTooltip
+            className="ml-2"
+            content="Swap memory is virtual memory that extends RAM by using disk space. It's used when physical RAM is full, but is slower than RAM."
+          />
         </CardTitle>
       </CardHeader>
       <CardContent>

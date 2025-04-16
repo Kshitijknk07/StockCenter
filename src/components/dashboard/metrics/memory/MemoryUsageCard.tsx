@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { MemoryStick } from "lucide-react";
 import { formatBytes } from "@/lib/format";
+import { InfoTooltip } from "@/components/ui/info-tooltip";
 
 interface MemoryUsageCardProps {
   memory: {
@@ -21,6 +22,10 @@ export function MemoryUsageCard({ memory }: MemoryUsageCardProps) {
             <MemoryStick className="h-4 w-4 text-primary" />
           </div>
           Memory Usage
+          <InfoTooltip
+            className="ml-2"
+            content="Shows the current RAM usage of your system. High memory usage may slow down your computer when running multiple applications."
+          />
         </CardTitle>
       </CardHeader>
       <CardContent>
