@@ -7,7 +7,6 @@ import {
   Network,
   MemoryStick,
   HardDrive,
-  BarChart3,
   Gauge,
 } from "lucide-react";
 import { useTheme } from "@/hooks/use-theme";
@@ -167,39 +166,62 @@ export function LandingPage() {
                 </div>
               </div>
 
-              {/* Processes */}
+              {/* Processes - Enhanced with more realistic data */}
               <div className="bg-background rounded p-2 border relative overflow-hidden">
                 <div className="flex items-center text-xs font-medium mb-1">
                   <Server className="h-3 w-3 mr-1 text-primary" />
                   Processes
                 </div>
                 <div className="text-xl font-bold">124</div>
-                <div className="text-xs text-muted-foreground mt-1 flex items-center">
-                  <span className="inline-block w-1.5 h-1.5 rounded-full bg-amber-500 mr-1"></span>
-                  8 high CPU
+                <div className="flex flex-col text-xs text-muted-foreground mt-1">
+                  <div className="flex items-center">
+                    <span className="inline-block w-1.5 h-1.5 rounded-full bg-amber-500 mr-1"></span>
+                    <span>8 high CPU</span>
+                  </div>
+                  <div className="flex items-center">
+                    <span className="inline-block w-1.5 h-1.5 rounded-full bg-blue-500 mr-1"></span>
+                    <span>3 high memory</span>
+                  </div>
                 </div>
               </div>
             </div>
 
-            {/* Mini chart section */}
+            {/* Process list preview */}
             <div className="border-t p-2">
               <div className="flex items-center justify-between mb-1">
                 <div className="text-xs font-medium flex items-center">
-                  <BarChart3 className="h-3 w-3 mr-1 text-primary" />
-                  CPU History
+                  <Server className="h-3 w-3 mr-1 text-primary" />
+                  Top Processes
                 </div>
-                <div className="text-xs text-muted-foreground">Avg: 42.8%</div>
+                <div className="text-xs text-muted-foreground">CPU Usage</div>
               </div>
-              <div className="h-8 w-full flex items-end space-x-0.5">
+              <div className="space-y-1.5 mt-1">
                 {[
-                  35, 42, 28, 45, 39, 56, 45, 52, 48, 38, 45, 43, 40, 45, 50,
-                  55, 48, 43, 40, 45,
-                ].map((value, i) => (
+                  { name: "chrome.exe", pid: 1234, cpu: 12.4, memory: 420 },
+                  { name: "vscode.exe", pid: 5678, cpu: 8.7, memory: 380 },
+                  { name: "explorer.exe", pid: 9012, cpu: 3.2, memory: 120 },
+                ].map((process, i) => (
                   <div
                     key={i}
-                    className="bg-primary/80 rounded-sm w-full"
-                    style={{ height: `${value}%` }}
-                  ></div>
+                    className="flex items-center justify-between text-xs"
+                  >
+                    <div className="flex items-center">
+                      <div className="w-1.5 h-1.5 rounded-full bg-primary mr-1.5"></div>
+                      <span className="font-medium">{process.name}</span>
+                      <span className="text-muted-foreground ml-1.5">
+                        PID: {process.pid}
+                      </span>
+                    </div>
+                    <div className="flex items-center">
+                      <span className="mr-2">{process.cpu}%</span>
+                      <div className="w-12 h-1.5 bg-primary/20 rounded-full">
+                        <div
+                          className="h-full bg-primary rounded-full"
+                          style={{ width: `${process.cpu * 3}%` }}
+                        ></div>
+                      </div>
+                    </div>
+                  </div>
                 ))}
               </div>
             </div>
