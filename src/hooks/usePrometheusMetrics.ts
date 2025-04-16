@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { SystemMetrics } from "@/types/metrics";
 
-// Define initial metrics state with all required properties
 const initialMetrics: SystemMetrics = {
   // System Info
   hostname: "Loading...",
@@ -42,6 +41,7 @@ const initialMetrics: SystemMetrics = {
     usagePercentage: 0,
     readSpeed: 0,
     writeSpeed: 0,
+    iops: undefined,
   },
   mountPoints: [],
 
@@ -65,9 +65,11 @@ const initialMetrics: SystemMetrics = {
     zombie: 0,
     topCpu: [],
     topMemory: [],
+    threads: undefined,
   },
 
   timestamp: Date.now(),
+  diskPartitions: undefined,
 };
 
 // Function to fetch metrics from the API
@@ -115,6 +117,7 @@ const fetchMetrics = async (): Promise<SystemMetrics> => {
         usagePercentage: Math.random() * 100,
         readSpeed: Math.random() * 100 * 1024 * 1024,
         writeSpeed: Math.random() * 50 * 1024 * 1024,
+        iops: undefined,
       },
       mountPoints: [
         {
@@ -173,6 +176,7 @@ const fetchMetrics = async (): Promise<SystemMetrics> => {
             cpu: Math.random() * 20,
             memory: Math.random() * 500 * 1024 * 1024,
           })),
+        threads: undefined,
       },
       timestamp: Date.now(),
     };

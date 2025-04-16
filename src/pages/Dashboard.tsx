@@ -104,12 +104,9 @@ export function Dashboard() {
                 <Network className="h-4 w-4" />
                 <span>Network</span>
               </TabsTrigger>
-              <TabsTrigger
-                value="processes"
-                className="flex items-center gap-2"
-              >
+              <TabsTrigger value="process" className="flex items-center gap-2">
                 <HardDrive className="h-4 w-4" />
-                <span>Processes</span>
+                <span>Processes</span>{" "}
               </TabsTrigger>
             </TabsList>
 
@@ -128,10 +125,11 @@ export function Dashboard() {
               />
             </TabsContent>
 
-            <TabsContent value="processes" className="mt-0">
+            <TabsContent value="process" className="mt-0">
+              {" "}
               <MetricsGrid
                 metrics={currentMetrics}
-                selectedCategory="processes"
+                selectedCategory="process"
               />
             </TabsContent>
           </Tabs>

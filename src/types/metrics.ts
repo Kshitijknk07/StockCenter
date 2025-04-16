@@ -1,4 +1,7 @@
+import React, { ReactNode } from "react";
+
 export interface SystemMetrics {
+  diskPartitions: unknown;
   // System Info
   hostname: string;
   os: string;
@@ -35,6 +38,7 @@ export interface SystemMetrics {
 
   // Disk Metrics
   disk: {
+    iops: unknown;
     total: number;
     used: number;
     free: number;
@@ -66,6 +70,7 @@ export interface SystemMetrics {
 
   // Process Metrics
   processes: {
+    threads: ReactNode;
     total: number;
     running: number;
     sleeping: number;
@@ -102,17 +107,20 @@ export interface SystemMetrics {
   timestamp: number;
 }
 
-export type MetricCategory =
-  | "system"
-  | "cpu"
-  | "memory"
-  | "disk"
-  | "network"
-  | "processes"
-  | "advanced";
+// Define MetricCategory type
+export type MetricCategory = "cpu" | "memory" | "disk" | "network" | "process";
 
+// Fix the line with 'any' on line 39 by using a more specific type
+// For example, if it's an object with unknown properties:
+export interface UnknownObject {
+  [key: string]: unknown;
+}
+
+// Then use this type instead of 'any'
+
+// Fix the ReactNode error by ensuring React is imported
 export interface MetricNavItem {
   id: MetricCategory;
   label: string;
-  icon: string;
+  icon: React.ReactNode; // Use React.ReactNode instead of just ReactNode
 }

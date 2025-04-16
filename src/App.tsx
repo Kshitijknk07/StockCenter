@@ -5,7 +5,6 @@ import { Toaster } from "@/components/ui/toaster";
 import { useTheme } from "./hooks/use-theme";
 
 function App() {
-  // Initialize theme hook to ensure theme is applied at app startup
   useTheme();
 
   return (
