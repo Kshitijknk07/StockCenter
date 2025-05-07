@@ -97,14 +97,6 @@ pipeline {
             }
         }
         
-        stage('Frontend - Build') {
-            steps {
-                dir('frontend') {
-                    sh 'npm run build'
-                }
-            }
-        }
-        
         stage('Frontend - Build Docker Image') {
             steps {
                 dir('frontend') {
