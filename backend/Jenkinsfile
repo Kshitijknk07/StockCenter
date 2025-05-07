@@ -44,6 +44,15 @@ pipeline {
                     echo "NODE_ENV=production" > .env.docker
                     echo "PORT=3000" >> .env.docker
                     
+                    echo "File contents:"
+                    cat .env.docker
+                    
+                    echo "Current directory:"
+                    pwd
+                    
+                    echo "Directory listing:"
+                    ls -la
+                    
                     echo "Creating Docker network"
                     docker network create stockpilot-network || true
                     '''
@@ -67,7 +76,8 @@ pipeline {
                     docker rm stockpilot-backend || true
                     docker run -d --name stockpilot-backend \
                       -p 3000:3000 \
-                      --env-file .env.docker \
+                      -e NODE_ENV=production \
+                      -e PORT=3000 \
                       --network stockpilot-network \
                       stockpilot-backend:${BUILD_NUMBER}
                     '''
