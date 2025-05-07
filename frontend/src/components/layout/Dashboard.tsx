@@ -19,8 +19,8 @@ export function Dashboard() {
             onClick={() => setTimeFrame("intraday")}
             className={`px-4 py-2 rounded ${
               timeFrame === "intraday"
-                ? "bg-primary text-primary-foreground"
-                : "bg-secondary"
+                ? "bg-black text-white border border-white"
+                : "bg-white text-black border border-black"
             }`}
           >
             Intraday
@@ -29,8 +29,8 @@ export function Dashboard() {
             onClick={() => setTimeFrame("daily")}
             className={`px-4 py-2 rounded ${
               timeFrame === "daily"
-                ? "bg-primary text-primary-foreground"
-                : "bg-secondary"
+                ? "bg-black text-white border border-white"
+                : "bg-white text-black border border-black"
             }`}
           >
             Daily
@@ -39,8 +39,8 @@ export function Dashboard() {
             onClick={() => setTimeFrame("weekly")}
             className={`px-4 py-2 rounded ${
               timeFrame === "weekly"
-                ? "bg-primary text-primary-foreground"
-                : "bg-secondary"
+                ? "bg-black text-white border border-white"
+                : "bg-white text-black border border-black"
             }`}
           >
             Weekly
@@ -49,8 +49,8 @@ export function Dashboard() {
             onClick={() => setTimeFrame("monthly")}
             className={`px-4 py-2 rounded ${
               timeFrame === "monthly"
-                ? "bg-primary text-primary-foreground"
-                : "bg-secondary"
+                ? "bg-black text-white border border-white"
+                : "bg-white text-black border border-black"
             }`}
           >
             Monthly

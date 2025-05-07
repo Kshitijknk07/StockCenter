@@ -4,10 +4,7 @@ import { Dashboard } from "./components/layout/Dashboard";
 
 function App() {
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <h1 style={{ color: "red", textAlign: "center", padding: "20px" }}>
-        STOCKPILOT TEST
-      </h1>
+    <div className="min-h-screen bg-black text-white">
       <Header />
       <div className="flex">
         <Sidebar />

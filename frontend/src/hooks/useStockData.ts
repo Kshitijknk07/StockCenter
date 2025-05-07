@@ -25,47 +25,56 @@ export function useStockData({
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(null);
 
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      let result;
+      switch (timeFrame) {
+        case "intraday":
+          result = await fetchStockData(symbol, interval);
+          break;
+        case "daily":
+          result = await fetchDailyStockData(symbol);
+          break;
+        case "weekly":
+          result = await fetchWeeklyStockData(symbol);
+          break;
+        case "monthly":
+          result = await fetchMonthlyStockData(symbol);
+          break;
+        default:
+          result = await fetchStockData(symbol, interval);
+      }
+
+      setData(result);
+    } catch (err) {
+      setError(
+        err instanceof Error ? err : new Error("An unknown error occurred")
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (!symbol) {
       setLoading(false);
       return;
     }
 
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-
-        let result;
-        switch (timeFrame) {
-          case "intraday":
-            result = await fetchStockData(symbol, interval);
-            break;
-          case "daily":
-            result = await fetchDailyStockData(symbol);
-            break;
-          case "weekly":
-            result = await fetchWeeklyStockData(symbol);
-            break;
-          case "monthly":
-            result = await fetchMonthlyStockData(symbol);
-            break;
-          default:
-            result = await fetchStockData(symbol, interval);
-        }
-
-        setData(result);
-      } catch (err) {
-        setError(
-          err instanceof Error ? err : new Error("An unknown error occurred")
-        );
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchData();
+
+    let intervalId: number | undefined;
+    if (timeFrame === "intraday") {
+      intervalId = window.setInterval(fetchData, 60000);
+    }
+
+    return () => {
+      if (intervalId) window.clearInterval(intervalId);
+    };
   }, [symbol, timeFrame, interval]);
 
-  return { data, loading, error };
+  return { data, loading, error, refetch: fetchData };
 }
