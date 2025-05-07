@@ -36,6 +36,21 @@ pipeline {
             }
         }
         
+        stage('Backend - Prepare Environment') {
+            steps {
+                dir('backend') {
+                    sh '''
+                    echo "Creating .env.docker file"
+                    echo "NODE_ENV=production" > .env.docker
+                    echo "PORT=3000" >> .env.docker
+                    
+                    echo "Creating Docker network"
+                    docker network create stockpilot-network || true
+                    '''
+                }
+            }
+        }
+        
         stage('Backend - Build Docker Image') {
             steps {
                 dir('backend') {
