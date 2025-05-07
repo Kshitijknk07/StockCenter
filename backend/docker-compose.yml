@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: stockpilot-backend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - ALPHA_VANTAGE_API_KEY=${ALPHA_VANTAGE_API_KEY}
+      - ALPHA_VANTAGE_API_KEY_DAILY=${ALPHA_VANTAGE_API_KEY_DAILY}
+      - ALPHA_VANTAGE_API_KEY_WEEKLY=${ALPHA_VANTAGE_API_KEY_WEEKLY}
+      - ALPHA_VANTAGE_API_KEY_MONTHLY=${ALPHA_VANTAGE_API_KEY_MONTHLY}
+      - ALPHA_VANTAGE_API_KEY_MARKET_STATUS=${ALPHA_VANTAGE_API_KEY_MARKET_STATUS}
+    volumes:
+      - ./logs:/app/logs
+    networks:
+      - stockpilot-network
+
+networks:
+  stockpilot-network:
+    driver: bridge
