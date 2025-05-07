@@ -8,7 +8,8 @@ pipeline {
     environment {
         DOCKERHUB_CREDENTIALS = credentials('dockerhub') 
         DOCKER_REGISTRY = 'docker.io'
-        DOCKER_IMAGE_NAME = 'kshitijnk007/stockpilot-backend'
+        DOCKER_IMAGE_NAME_BACKEND = 'kshitijnk007/stockpilot-backend'
+        DOCKER_IMAGE_NAME_FRONTEND = 'kshitijnk007/stockpilot-frontend'
     }
     
     stages {
@@ -18,6 +19,7 @@ pipeline {
             }
         }
         
+        // Backend stages
         stage('Backend - Install Dependencies') {
             steps {
                 dir('backend') {
@@ -71,40 +73,90 @@ pipeline {
                 dir('backend') {
                     sh '''
                     docker build -t stockpilot-backend:${BUILD_NUMBER} .
-                    docker tag stockpilot-backend:${BUILD_NUMBER} ${DOCKER_IMAGE_NAME}:${BUILD_NUMBER}
-                    docker tag stockpilot-backend:${BUILD_NUMBER} ${DOCKER_IMAGE_NAME}:latest
+                    docker tag stockpilot-backend:${BUILD_NUMBER} ${DOCKER_IMAGE_NAME_BACKEND}:${BUILD_NUMBER}
+                    docker tag stockpilot-backend:${BUILD_NUMBER} ${DOCKER_IMAGE_NAME_BACKEND}:latest
                     '''
                 }
             }
         }
         
-        stage('Backend - Push Docker Image') {
+        // Frontend stages
+        stage('Frontend - Install Dependencies') {
+            steps {
+                dir('frontend') {
+                    sh 'npm install'
+                }
+            }
+        }
+        
+        stage('Frontend - Lint') {
+            steps {
+                dir('frontend') {
+                    sh 'npm run lint || true'
+                }
+            }
+        }
+        
+        stage('Frontend - Build') {
+            steps {
+                dir('frontend') {
+                    sh 'npm run build'
+                }
+            }
+        }
+        
+        stage('Frontend - Build Docker Image') {
+            steps {
+                dir('frontend') {
+                    sh '''
+                    docker build -t stockpilot-frontend:${BUILD_NUMBER} .
+                    docker tag stockpilot-frontend:${BUILD_NUMBER} ${DOCKER_IMAGE_NAME_FRONTEND}:${BUILD_NUMBER}
+                    docker tag stockpilot-frontend:${BUILD_NUMBER} ${DOCKER_IMAGE_NAME_FRONTEND}:latest
+                    '''
+                }
+            }
+        }
+        
+        // Push Docker Images
+        stage('Push Docker Images') {
             steps {
                 sh 'echo ${DOCKERHUB_CREDENTIALS_PSW} | docker login ${DOCKER_REGISTRY} -u ${DOCKERHUB_CREDENTIALS_USR} --password-stdin'
                 
                 sh '''
-                docker push ${DOCKER_IMAGE_NAME}:${BUILD_NUMBER}
-                docker push ${DOCKER_IMAGE_NAME}:latest
+                docker push ${DOCKER_IMAGE_NAME_BACKEND}:${BUILD_NUMBER}
+                docker push ${DOCKER_IMAGE_NAME_BACKEND}:latest
+                docker push ${DOCKER_IMAGE_NAME_FRONTEND}:${BUILD_NUMBER}
+                docker push ${DOCKER_IMAGE_NAME_FRONTEND}:latest
                 '''
                 
                 sh 'docker logout ${DOCKER_REGISTRY}'
             }
         }
         
-        stage('Deploy Backend') {
+        // Deploy both services
+        stage('Deploy Services') {
             steps {
                 dir('backend') {
                     sh '''
                     docker stop stockpilot-backend || true
                     docker rm stockpilot-backend || true
                     docker run -d --name stockpilot-backend \
-                      -p 3000:3000 \
-                      -e NODE_ENV=production \
-                      -e PORT=3000 \
-                      --network stockpilot-network \
-                      stockpilot-backend:${BUILD_NUMBER}
+                        --network stockpilot-network \
+                        -p 3000:3000 \
+                        -e NODE_ENV=production \
+                        -e PORT=3000 \
+                        ${DOCKER_IMAGE_NAME_BACKEND}:latest
                     '''
                 }
+                
+                sh '''
+                docker stop stockpilot-frontend || true
+                docker rm stockpilot-frontend || true
+                docker run -d --name stockpilot-frontend \
+                    --network stockpilot-network \
+                    -p 80:80 \
+                    ${DOCKER_IMAGE_NAME_FRONTEND}:latest
+                '''
             }
         }
     }

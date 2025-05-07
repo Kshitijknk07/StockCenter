@@ -1,6 +1,7 @@
 "use strict";
 
 const express = require("express");
+const cors = require("cors");
 require("dotenv").config();
 const stockRoutes = require("./routes/stockRoutes");
 const dailyStockRoutes = require("./routes/dailyStockRoutes");
@@ -11,6 +12,7 @@ const marketStatusRoutes = require("./routes/marketStatusRoutes");
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+app.use(cors());
 app.use(express.json());
 
 app.use("/api/stock", stockRoutes);

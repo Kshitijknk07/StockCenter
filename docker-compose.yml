@@ -3,7 +3,7 @@ version: '3.8'
 services:
   backend:
     build:
-      context: .
+      context: ./backend
       dockerfile: Dockerfile
     container_name: stockpilot-backend
     restart: unless-stopped
@@ -18,13 +18,13 @@ services:
       - ALPHA_VANTAGE_API_KEY_MONTHLY=${ALPHA_VANTAGE_API_KEY_MONTHLY}
       - ALPHA_VANTAGE_API_KEY_MARKET_STATUS=${ALPHA_VANTAGE_API_KEY_MARKET_STATUS}
     volumes:
-      - ./logs:/app/logs
+      - ./backend/logs:/app/logs
     networks:
       - stockpilot-network
       
   frontend:
     build:
-      context: ../frontend
+      context: ./frontend
       dockerfile: Dockerfile
     container_name: stockpilot-frontend
     restart: unless-stopped
