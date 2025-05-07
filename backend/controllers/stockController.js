@@ -1,32 +1,43 @@
-"use strict";
+const stockService = require("../services/stockService");
 
-const axios = require("axios");
-const { processStockData } = require("../utils/stockUtils");
-
-const getStockData = async (req, res) => {
+exports.getIntradayData = async (req, res) => {
   try {
-    const { symbol } = req.params;
     const {
-      interval = "5min",
+      symbol,
+      interval,
       adjusted,
       extendedHours,
       month,
       outputsize,
-      format,
+      datatype,
     } = req.query;
 
-    const data = await fetchStockData(
+    if (!symbol || !interval) {
+      return res
+        .status(400)
+        .json({ error: "Symbol and interval are required parameters" });
+    }
+
+    if (!["1min", "5min", "15min", "30min", "60min"].includes(interval)) {
+      return res
+        .status(400)
+        .json({
+          error: "Interval must be one of: 1min, 5min, 15min, 30min, 60min",
+        });
+    }
+
+    const parsedAdjusted = adjusted === "false" ? false : true;
+    const parsedExtendedHours = extendedHours === "false" ? false : true;
+
+    const data = await stockService.getIntradayData(
       symbol,
       interval,
-      adjusted === "false" ? false : true,
-      extendedHours === "false" ? false : true,
+      parsedAdjusted,
+      parsedExtendedHours,
       month,
-      outputsize
+      outputsize,
+      datatype
     );
-
-    if (format === "processed") {
-      return res.json(processStockData(data));
-    }
 
     res.json(data);
   } catch (error) {
@@ -34,36 +45,26 @@ const getStockData = async (req, res) => {
   }
 };
 
-const fetchStockData = async (
-  symbol,
-  interval,
-  adjusted = true,
-  extendedHours = true,
-  month = null,
-  outputsize = "compact"
-) => {
+exports.searchSymbol = async (req, res) => {
   try {
-    const apiKey = process.env.ALPHA_VANTAGE_API_KEY;
-    if (!apiKey) throw new Error("API key not found");
+    const { keywords } = req.query;
 
-    let url = `https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=${symbol}&interval=${interval}&apikey=${apiKey}`;
+    if (!keywords) {
+      return res.status(400).json({ error: "Keywords parameter is required" });
+    }
 
-    url += `&adjusted=${adjusted}`;
-    url += `&extended_hours=${extendedHours}`;
-    if (month) url += `&month=${month}`;
-    url += `&outputsize=${outputsize}`;
-
-    const response = await axios.get(url, {
-      headers: { "User-Agent": "StockPilot/1.0.0" },
-    });
-
-    return response.data;
+    const data = await stockService.searchSymbol(keywords);
+    res.json(data);
   } catch (error) {
-    console.error("Error fetching stock data:", error.message);
-    throw error;
+    res.status(500).json({ error: error.message });
   }
 };
 
-module.exports = {
-  getStockData,
+exports.getMarketStatus = async (req, res) => {
+  try {
+    const data = await stockService.getMarketStatus();
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 };
