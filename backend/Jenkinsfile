@@ -5,6 +5,12 @@ pipeline {
         nodejs 'NodeJS 24'
     }
     
+    environment {
+        DOCKERHUB_CREDENTIALS = credentials('dockerhub') 
+        DOCKER_REGISTRY = 'docker.io'
+        DOCKER_IMAGE_NAME = 'kshitijnk007/stockpilot-backend'
+    }
+    
     stages {
         stage('Checkout') { 
             steps {
@@ -63,8 +69,25 @@ pipeline {
         stage('Backend - Build Docker Image') {
             steps {
                 dir('backend') {
-                    sh 'docker build -t stockpilot-backend:${BUILD_NUMBER} .'
+                    sh '''
+                    docker build -t stockpilot-backend:${BUILD_NUMBER} .
+                    docker tag stockpilot-backend:${BUILD_NUMBER} ${DOCKER_IMAGE_NAME}:${BUILD_NUMBER}
+                    docker tag stockpilot-backend:${BUILD_NUMBER} ${DOCKER_IMAGE_NAME}:latest
+                    '''
                 }
+            }
+        }
+        
+        stage('Backend - Push Docker Image') {
+            steps {
+                sh 'echo ${DOCKERHUB_CREDENTIALS_PSW} | docker login ${DOCKER_REGISTRY} -u ${DOCKERHUB_CREDENTIALS_USR} --password-stdin'
+                
+                sh '''
+                docker push ${DOCKER_IMAGE_NAME}:${BUILD_NUMBER}
+                docker push ${DOCKER_IMAGE_NAME}:latest
+                '''
+                
+                sh 'docker logout ${DOCKER_REGISTRY}'
             }
         }
         
