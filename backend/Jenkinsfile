@@ -36,50 +36,10 @@ pipeline {
             }
         }
         
-        stage('Frontend - Install Dependencies') {
-            steps {
-                dir('frotnend') {
-                    sh 'npm install'
-                }
-            }
-        }
-        
-        stage('Frontend - Lint') {
-            steps {
-                dir('frotnend') {
-                    sh 'npm run lint || true'
-                }
-            }
-        }
-        
-        stage('Frontend - Test') {
-            steps {
-                dir('frotnend') {
-                    sh 'npm test || true'
-                }
-            }
-        }
-        
-        stage('Frontend - Build') {
-            steps {
-                dir('frotnend') {
-                    sh 'npm run build'
-                }
-            }
-        }
-        
         stage('Backend - Build Docker Image') {
             steps {
                 dir('backend') {
                     sh 'docker build -t stockpilot-backend:${BUILD_NUMBER} .'
-                }
-            }
-        }
-        
-        stage('Frontend - Build Docker Image') {
-            steps {
-                dir('frotnend') {
-                    sh 'docker build -t stockpilot-frontend:${BUILD_NUMBER} .'
                 }
             }
         }
@@ -95,21 +55,6 @@ pipeline {
                       --env-file .env.docker \
                       --network stockpilot-network \
                       stockpilot-backend:${BUILD_NUMBER}
-                    '''
-                }
-            }
-        }
-        
-        stage('Deploy Frontend') {
-            steps {
-                dir('frotnend') {
-                    sh '''
-                    docker stop stockpilot-frontend || true
-                    docker rm stockpilot-frontend || true
-                    docker run -d --name stockpilot-frontend \
-                      -p 80:80 \
-                      --network stockpilot-network \
-                      stockpilot-frontend:${BUILD_NUMBER}
                     '''
                 }
             }
