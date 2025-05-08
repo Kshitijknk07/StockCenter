@@ -24,11 +24,17 @@ func main() {
 	dailyHandler := handler.NewDailyHandler(dailyService)
 	weeklyService := service.NewWeeklyService()
 	weeklyHandler := handler.NewWeeklyHandler(weeklyService)
+	monthlyService := service.NewMonthlyService()
+	monthlyHandler := handler.NewMonthlyHandler(monthlyService)
+	quoteService := service.NewQuoteService()
+	quoteHandler := handler.NewQuoteHandler(quoteService)
 
 	r := mux.NewRouter()
 	r.HandleFunc("/api/intraday", intradayHandler.GetIntraday).Methods("GET")
 	r.HandleFunc("/api/daily", dailyHandler.GetDaily).Methods("GET")
 	r.HandleFunc("/api/weekly", weeklyHandler.GetWeekly).Methods("GET")
+	r.HandleFunc("/api/monthly", monthlyHandler.GetMonthly).Methods("GET")
+	r.HandleFunc("/api/quote", quoteHandler.GetQuote).Methods("GET")
 
 	srv := &http.Server{
 		Handler:      r,
