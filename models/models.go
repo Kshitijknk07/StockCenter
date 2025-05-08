@@ -21,3 +21,13 @@ type TimeSeriesData struct {
 	Close  string `json:"4. close"`
 	Volume string `json:"5. volume"`
 }
+
+type DailyResponse struct {
+	MetaData   MetaData                  `json:"Meta Data"`
+	TimeSeries map[string]TimeSeriesData `json:"Time Series (Daily)"`
+}
+
+type WeeklyResponse struct {
+	MetaData   MetaData                  `json:"Meta Data"`
+	TimeSeries map[string]TimeSeriesData `json:"Weekly Time Series"`
+}

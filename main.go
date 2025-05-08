@@ -15,14 +15,20 @@ func main() {
 	_ = godotenv.Load()
 	port := os.Getenv("PORT")
 	if port == "" {
-		port = "8080"
+		port = "9090"
 	}
 
 	stockService := service.NewStockService()
 	intradayHandler := handler.NewIntradayHandler(stockService)
+	dailyService := service.NewDailyService()
+	dailyHandler := handler.NewDailyHandler(dailyService)
+	weeklyService := service.NewWeeklyService()
+	weeklyHandler := handler.NewWeeklyHandler(weeklyService)
 
 	r := mux.NewRouter()
 	r.HandleFunc("/api/intraday", intradayHandler.GetIntraday).Methods("GET")
+	r.HandleFunc("/api/daily", dailyHandler.GetDaily).Methods("GET")
+	r.HandleFunc("/api/weekly", weeklyHandler.GetWeekly).Methods("GET")
 
 	srv := &http.Server{
 		Handler:      r,
