@@ -1,27 +1,49 @@
-const express = require('express');
-const Joi = require('joi');
-const stockController = require('../controllers/stockController');
-const { validateRequest } = require('../middleware/validator');
+const express = require("express");
+const stockController = require("../controllers/stockController");
+const { validateRequest } = require("../middleware/validator");
+const {
+  marketStatusSchema,
+  marketHolidaySchema,
+  insiderTransactionsSchema,
+  insiderSentimentSchema,
+  financialsReportedSchema,
+} = require("../schemas/stockSchemas");
 
 const router = express.Router();
 
-const candlesSchema = Joi.object({
-  symbol: Joi.string().required(),
-  resolution: Joi.string().valid('1', '5', '15', '30', '60', 'D', 'W', 'M').required(),
-  from: Joi.number().integer().required(),
-  to: Joi.number().integer().required()
-});
+// Market Status
+router.get(
+  "/market-status",
+  validateRequest(marketStatusSchema),
+  stockController.getMarketStatus
+);
 
-const quoteSchema = Joi.object({
-  symbol: Joi.string().required()
-});
+// Market Holiday
+router.get(
+  "/market-holiday",
+  validateRequest(marketHolidaySchema),
+  stockController.getMarketHoliday
+);
 
-const companyProfileSchema = Joi.object({
-  symbol: Joi.string().required()
-});
+// Insider Transactions
+router.get(
+  "/insider-transactions",
+  validateRequest(insiderTransactionsSchema),
+  stockController.getInsiderTransactions
+);
 
-router.get('/candles', validateRequest(candlesSchema), stockController.getCandles);
-router.get('/quote', validateRequest(quoteSchema), stockController.getQuote);
-router.get('/company-profile', validateRequest(companyProfileSchema), stockController.getCompanyProfile);
+// Insider Sentiment
+router.get(
+  "/insider-sentiment",
+  validateRequest(insiderSentimentSchema),
+  stockController.getInsiderSentiment
+);
+
+// Financials Reported
+router.get(
+  "/financials-reported",
+  validateRequest(financialsReportedSchema),
+  stockController.getFinancialsReported
+);
 
 module.exports = router;

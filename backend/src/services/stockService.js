@@ -66,100 +66,103 @@ class StockService {
     }
   }
 
-  connectWebSocket() {
-    if (this.socket) {
-      return;
-    }
-
-    this.socket = new WebSocket(
-      `wss://ws.finnhub.io?token=${config.finnhub.apiKey}`
-    );
-
-    this.socket.on("open", () => {
-      logger.info("WebSocket connection established");
-
-      // Subscribe to symbols that were requested before connection was established
-      this.subscribers.forEach((callbacks, symbol) => {
-        this.subscribeToSymbol(symbol);
-      });
-    });
-
-    this.socket.on("message", (data) => {
-      try {
-        const parsedData = JSON.parse(data);
-        if (parsedData.type === "trade") {
-          parsedData.data.forEach((trade) => {
-            const symbol = trade.s;
-            const callbacks = this.subscribers.get(symbol) || [];
-            callbacks.forEach((callback) => {
-              callback(trade);
-            });
-          });
+  async getMarketStatus(exchange) {
+    try {
+      const response = await httpClient.get(
+        `${config.finnhub.baseUrl}/stock/market-status`,
+        {
+          params: {
+            exchange,
+            token: config.finnhub.apiKey,
+          },
         }
-      } catch (error) {
-        logger.error("Error processing WebSocket message:", error);
-      }
-    });
+      );
 
-    this.socket.on("error", (error) => {
-      logger.error("WebSocket error:", error);
-    });
-
-    this.socket.on("close", () => {
-      logger.info("WebSocket connection closed");
-      this.socket = null;
-
-      // Attempt to reconnect after a delay
-      setTimeout(() => {
-        this.connectWebSocket();
-      }, 5000);
-    });
+      return response.data;
+    } catch (error) {
+      logger.error("Error fetching market status:", error);
+      throw error;
+    }
   }
 
-  subscribeToSymbol(symbol) {
-    if (!this.socket || this.socket.readyState !== WebSocket.OPEN) {
-      this.connectWebSocket();
-      return;
-    }
+  async getMarketHoliday(exchange) {
+    try {
+      const response = await httpClient.get(
+        `${config.finnhub.baseUrl}/stock/market-holiday`,
+        {
+          params: {
+            exchange,
+            token: config.finnhub.apiKey,
+          },
+        }
+      );
 
-    this.socket.send(JSON.stringify({ type: "subscribe", symbol }));
-    logger.info(`Subscribed to symbol: ${symbol}`);
+      return response.data;
+    } catch (error) {
+      logger.error("Error fetching market holiday data:", error);
+      throw error;
+    }
   }
 
-  unsubscribeFromSymbol(symbol) {
-    if (!this.socket || this.socket.readyState !== WebSocket.OPEN) {
-      return;
-    }
+  async getInsiderTransactions(symbol, from, to) {
+    try {
+      const params = {
+        symbol,
+        token: config.finnhub.apiKey,
+      };
 
-    this.socket.send(JSON.stringify({ type: "unsubscribe", symbol }));
-    logger.info(`Unsubscribed from symbol: ${symbol}`);
+      if (from) params.from = from;
+      if (to) params.to = to;
+
+      const response = await httpClient.get(
+        `${config.finnhub.baseUrl}/stock/insider-transactions`,
+        { params }
+      );
+
+      return response.data;
+    } catch (error) {
+      logger.error("Error fetching insider transactions:", error);
+      throw error;
+    }
   }
 
-  addTradeListener(symbol, callback) {
-    if (!this.subscribers.has(symbol)) {
-      this.subscribers.set(symbol, []);
-      this.subscribeToSymbol(symbol);
-    }
+  async getInsiderSentiment(symbol, from, to) {
+    try {
+      const response = await httpClient.get(
+        `${config.finnhub.baseUrl}/stock/insider-sentiment`,
+        {
+          params: {
+            symbol,
+            from,
+            to,
+            token: config.finnhub.apiKey,
+          },
+        }
+      );
 
-    this.subscribers.get(symbol).push(callback);
-    return () => this.removeTradeListener(symbol, callback);
+      return response.data;
+    } catch (error) {
+      logger.error("Error fetching insider sentiment:", error);
+      throw error;
+    }
   }
 
-  removeTradeListener(symbol, callback) {
-    if (!this.subscribers.has(symbol)) {
-      return;
-    }
+  async getFinancialsReported(params = {}) {
+    try {
+      const requestParams = {
+        ...params,
+        token: config.finnhub.apiKey,
+      };
 
-    const callbacks = this.subscribers.get(symbol);
-    const index = callbacks.indexOf(callback);
+      const response = await httpClient.get(
+        `${config.finnhub.baseUrl}/stock/financials-reported`,
+        { params: requestParams }
+      );
 
-    if (index !== -1) {
-      callbacks.splice(index, 1);
-    }
-
-    if (callbacks.length === 0) {
-      this.subscribers.delete(symbol);
-      this.unsubscribeFromSymbol(symbol);
+      return response.data;
+    } catch (error) {
+      logger.error("Error fetching financials reported:", error);
+      throw error;
     }
   }
 }
