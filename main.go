@@ -28,6 +28,12 @@ func main() {
 	monthlyHandler := handler.NewMonthlyHandler(monthlyService)
 	quoteService := service.NewQuoteService()
 	quoteHandler := handler.NewQuoteHandler(quoteService)
+	searchService := service.NewSearchService()
+	searchHandler := handler.NewSearchHandler(searchService)
+	marketStatusService := service.NewMarketStatusService()
+	marketStatusHandler := handler.NewMarketStatusHandler(marketStatusService)
+	historicalOptionsService := service.NewHistoricalOptionsService()
+	historicalOptionsHandler := handler.NewHistoricalOptionsHandler(historicalOptionsService)
 
 	r := mux.NewRouter()
 	r.HandleFunc("/api/intraday", intradayHandler.GetIntraday).Methods("GET")
@@ -35,6 +41,9 @@ func main() {
 	r.HandleFunc("/api/weekly", weeklyHandler.GetWeekly).Methods("GET")
 	r.HandleFunc("/api/monthly", monthlyHandler.GetMonthly).Methods("GET")
 	r.HandleFunc("/api/quote", quoteHandler.GetQuote).Methods("GET")
+	r.HandleFunc("/api/search", searchHandler.Search).Methods("GET")
+	r.HandleFunc("/api/market-status", marketStatusHandler.GetMarketStatus).Methods("GET")
+	r.HandleFunc("/api/historical-options", historicalOptionsHandler.GetHistoricalOptions).Methods("GET")
 
 	srv := &http.Server{
 		Handler:      r,

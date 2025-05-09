@@ -53,3 +53,61 @@ type QuoteData struct {
 	Change           string `json:"09. change"`
 	ChangePercent    string `json:"10. change percent"`
 }
+
+type SearchResponse struct {
+	BestMatches []SearchMatch `json:"bestMatches"`
+}
+
+type SearchMatch struct {
+	Symbol      string `json:"1. symbol"`
+	Name        string `json:"2. name"`
+	Type        string `json:"3. type"`
+	Region      string `json:"4. region"`
+	MarketOpen  string `json:"5. marketOpen"`
+	MarketClose string `json:"6. marketClose"`
+	Timezone    string `json:"7. timezone"`
+	Currency    string `json:"8. currency"`
+	MatchScore  string `json:"9. matchScore"`
+}
+
+type MarketStatusResponse struct {
+	Markets []MarketStatus `json:"markets"`
+}
+
+type MarketStatus struct {
+	MarketType string `json:"market_type"`
+	Region     string `json:"region"`
+	PrimaryEx  string `json:"primary_ex"`
+	LocalOpen  string `json:"local_open"`
+	LocalClose string `json:"local_close"`
+	Current    string `json:"current_status"`
+}
+
+type HistoricalOptionsResponse struct {
+	Symbol   string          `json:"symbol"`
+	Date     string          `json:"date"`
+	Expiries []OptionsExpiry `json:"expiries"`
+}
+
+type OptionsExpiry struct {
+	ExpirationDate string         `json:"expiration_date"`
+	Calls          []OptionDetail `json:"calls"`
+	Puts           []OptionDetail `json:"puts"`
+}
+
+type OptionDetail struct {
+	ContractType string `json:"contract_type"`
+	Symbol       string `json:"symbol"`
+	Strike       string `json:"strike"`
+	LastPrice    string `json:"last_price"`
+	Bid          string `json:"bid"`
+	Ask          string `json:"ask"`
+	Volume       string `json:"volume"`
+	OpenInterest string `json:"open_interest"`
+	ImpliedVol   string `json:"implied_volatility"`
+	Delta        string `json:"delta"`
+	Gamma        string `json:"gamma"`
+	Theta        string `json:"theta"`
+	Vega         string `json:"vega"`
+	Rho          string `json:"rho"`
+}
