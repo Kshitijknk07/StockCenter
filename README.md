@@ -16,6 +16,9 @@ StockCenter is a powerful, flexible backend service for retrieving and managing 
 - **Options Data**: Access historical options pricing information
 - **RESTful Architecture**: Clean, well-documented API endpoints
 - **Scalable Design**: Built with performance and reliability in mind
+- **Security**: Rate limiting, CORS support, and input validation
+- **Monitoring**: Health checks and system metrics
+- **Containerized**: Ready for Docker deployment
 
 ## Installation
 
@@ -53,6 +56,7 @@ StockCenter is a powerful, flexible backend service for retrieving and managing 
 
 | Endpoint | Method | Description | Parameters |
 |----------|--------|-------------|------------|
+| `/health` | GET | System health and metrics | None |
 | `/api/intraday` | GET | Get intraday time series data | `symbol` (required), `interval` (optional) |
 | `/api/daily` | GET | Get daily time series data | `symbol` (required), `outputsize` (optional) |
 | `/api/weekly` | GET | Get weekly time series data | `symbol` (required) |
@@ -62,9 +66,39 @@ StockCenter is a powerful, flexible backend service for retrieving and managing 
 | `/api/market-status` | GET | Get current market status | None |
 | `/api/historical-options` | GET | Get historical options data | `symbol` (required), `date` (optional) |
 
-## Frontend Integration
+## Security Features
 
-StockCenter is designed to be easily integrated with any frontend technology. Here are some examples:
+- **Rate Limiting**: 100 requests per minute per IP address
+- **CORS Support**: Cross-Origin Resource Sharing enabled
+- **Input Validation**: All required parameters are validated
+- **Error Handling**: Standardized error responses
+
+## Monitoring
+
+The `/health` endpoint provides:
+- System status
+- Uptime
+- Memory usage statistics
+- Timestamp
+
+## Docker Deployment
+
+```bash
+# Build the Docker image
+docker build -t stockcenter .
+
+# Run the container
+docker run -p 9090:9090 -e STOCK_API_KEY=your_api_key stockcenter
+```
+
+## Testing
+
+Run the test suite:
+```bash
+go test ./...
+```
+
+## Frontend Integration
 
 ### React Example
 
@@ -139,15 +173,20 @@ export default {
 </script>
 ```
 
-## Docker Support
+## Error Responses
 
-StockCenter can be containerized for easy deployment:
-
-```bash
-# Build the Docker image
-docker build -t stockcenter .
-
-# Run the container
-docker run -p 9090:9090 -e STOCK_API_KEY=your_api_key stockcenter
+All error responses follow this format:
+```json
+{
+  "status": 400,
+  "message": "Error message",
+  "error": "Detailed error information"
+}
 ```
+
+## Rate Limiting
+
+The API implements rate limiting:
+- 100 requests per minute per IP address
+- Rate limit exceeded responses include a 429 status code
 

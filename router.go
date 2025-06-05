@@ -1,24 +1,16 @@
 package main
 
 import (
-	"log"
 	"net/http"
-	"os"
 	"stockcenter/handler"
 	"stockcenter/middleware"
 	"stockcenter/service"
+	"time"
 
 	"github.com/gorilla/mux"
-	"github.com/joho/godotenv"
 )
 
-func main() {
-	_ = godotenv.Load()
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "9090"
-	}
-
+func setupRouter() http.Handler {
 	stockService := service.NewStockService()
 	intradayHandler := handler.NewIntradayHandler(stockService)
 	dailyService := service.NewDailyService()
@@ -36,8 +28,14 @@ func main() {
 	historicalOptionsService := service.NewHistoricalOptionsService()
 	historicalOptionsHandler := handler.NewHistoricalOptionsHandler(historicalOptionsService)
 
+	rateLimiter := middleware.NewRateLimiter(100, time.Minute)
+
 	r := mux.NewRouter()
 	r.Use(middleware.LoggingMiddleware)
+	r.Use(middleware.CORS)
+	r.Use(rateLimiter.RateLimit)
+
+	r.HandleFunc("/health", handler.GetHealth).Methods("GET")
 
 	api := r.PathPrefix("/api").Subrouter()
 	api.Use(middleware.ValidateSymbol)
@@ -51,13 +49,5 @@ func main() {
 	api.HandleFunc("/market-status", marketStatusHandler.GetMarketStatus).Methods("GET")
 	api.HandleFunc("/historical-options", historicalOptionsHandler.GetHistoricalOptions).Methods("GET")
 
-	srv := &http.Server{
-		Handler:      r,
-		Addr:         ":" + port,
-		WriteTimeout: 15 * 1e9,
-		ReadTimeout:  15 * 1e9,
-	}
-
-	log.Printf("Server running on port %s", port)
-	log.Fatal(srv.ListenAndServe())
+	return r
 }
